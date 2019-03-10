@@ -832,10 +832,16 @@ proc fromVariant*[T: Table or TableRef or OrderedTable or OrderedTableRef](t: va
   else:
     result = ConversionResult.TypeError
 
-{.emit: """/*TYPESECTION*/
-N_LIB_EXPORT N_CDECL(void, NimMain)(void);
-N_NOINLINE(void, nimGC_setStackBottom)(void* thestackbottom);
-""".}
+when (NimMajor, NimMinor, NimPatch) < (0, 19, 0):
+  {.emit: """/*TYPESECTION*/
+  N_LIB_EXPORT N_CDECL(void, NimMain)(void);
+  N_NOINLINE(void, setStackBottom)(void* thestackbottom);
+  """.}
+else:
+  {.emit: """/*TYPESECTION*/
+  N_LIB_EXPORT N_CDECL(void, NimMain)(void);
+  N_NOINLINE(void, nimGC_setStackBottom)(void* thestackbottom);
+  """.}
 
 var nativeLibHandle: pointer
 proc getNativeLibHandle*(): pointer =
@@ -848,10 +854,17 @@ proc godot_nativescript_init(handle: pointer) {.
   nativeLibHandle = handle
 
   var stackBottom {.volatile.}: pointer
-  {.emit: """
-    NimMain();
-    nimGC_setStackBottom((void*)(&`stackBottom`));
-  """.}
+
+  when (NimMajor, NimMinor, NimPatch) < (0, 19, 0):
+    {.emit: """
+      NimMain();
+      setStackBottom((void*)(&`stackBottom`));
+    """.}
+  else:
+    {.emit: """
+      NimMain();
+      nimGC_setStackBottom((void*)(&`stackBottom`));
+    """.}
   GC_fullCollect()
   GC_disable()
 
@@ -886,9 +899,15 @@ proc registerFrameCallback*(cb: proc () {.closure.}) =
 
 proc godot_nativescript_frame() {.cdecl, exportc, dynlib.} =
   var stackBottom {.volatile.}: pointer
-  {.emit: """
-  nimGC_setStackBottom((void*)(&`stackBottom`));
-  """.}
+
+  when (NimMajor, NimMinor, NimPatch) < (0, 19, 0):
+    {.emit: """
+    setStackBottom((void*)(&`stackBottom`));
+    """.}
+  else:
+    {.emit: """
+    nimGC_setStackBottom((void*)(&`stackBottom`));
+    """.}
   for cb in idleCallbacks:
     cb()
   GC_step(nimGcStepLengthUs, true, 0)

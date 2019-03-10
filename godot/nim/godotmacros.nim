@@ -544,17 +544,28 @@ proc genType(obj: ObjectDecl): NimNode {.compileTime.} =
   template registerGodotMethod(classNameLit, classNameIdent, methodNameIdent,
                                methodNameLit, minArgs, maxArgs,
                                argTypes, methFuncIdent, hasReturnValue) =
-    {.emit: """/*TYPESECTION*/
-N_NOINLINE(void, nimGC_setStackBottom)(void* thestackbottom);
-""".}
+    when (NimMajor, NimMinor, NimPatch) < (0, 19, 0):
+      {.emit: """/*TYPESECTION*/
+      N_NOINLINE(void, setStackBottom)(void* thestackbottom);
+      """.}
+    else:
+      {.emit: """/*TYPESECTION*/
+      N_NOINLINE(void, nimGC_setStackBottom)(void* thestackbottom);
+      """.}
+
     proc methFuncIdent(obj: ptr GodotObject, methodData: pointer,
                        userData: pointer, numArgs: cint,
                        args: var array[MAX_ARG_COUNT, ptr GodotVariant]):
                       GodotVariant {.noconv.} =
       var stackBottom {.volatile.}: pointer
-      {.emit: """
-      nimGC_setStackBottom((void*)(&`stackBottom`));
-      """.}
+      when (NimMajor, NimMinor, NimPatch) < (0, 19, 0):
+        {.emit: """
+        setStackBottom((void*)(&`stackBottom`));
+        """.}
+      else:
+        {.emit: """
+        nimGC_setStackBottom((void*)(&`stackBottom`));
+        """.}
       let self = cast[classNameIdent](userData)
       const isStaticCall = methodNameLit == cstring"_ready" or
                            methodNameLit == cstring"_process" or
