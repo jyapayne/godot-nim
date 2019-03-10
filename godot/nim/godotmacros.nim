@@ -1,8 +1,8 @@
 # Copyright 2018 Xored Software, Inc.
 
 import macros, tables, typetraits, strutils, sets, sequtils, options
-import godotinternal, internal.godotvariants
-import godotnim, core.variants
+import godotinternal, internal/godotvariants
+import godotnim, core/variants
 
 type
   VarDecl = ref object

@@ -2,7 +2,7 @@
 
 import streams, json, os, strutils, times, sets, tables, options
 import sequtils, algorithm
-import compiler.ast, compiler.renderer, compiler.idents, compiler.astalgo
+import compiler/ast, compiler/renderer, compiler/idents, compiler/astalgo
 
 when (NimMajor, NimMinor, NimPatch) >= (0, 19, 0):
   var gic* = newIdentCache()

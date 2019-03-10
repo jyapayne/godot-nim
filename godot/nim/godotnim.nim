@@ -2,13 +2,13 @@
 
 import tables, typetraits, macros, unicode, strutils, sets
 import gdnativeapi
-import core.godotcoretypes, core.godotbase
-import core.vector2, core.rect2,
-       core.vector3, core.transform2d,
-       core.planes, core.quats, core.aabb,
-       core.basis, core.transforms, core.colors,
-       core.nodepaths, core.rids, core.dictionaries,
-       core.arrays, core.poolarrays, core.variants
+import core/godotcoretypes, core/godotbase
+import core/vector2, core/rect2,
+       core/vector3, core/transform2d,
+       core/planes, core/quats, core/aabb,
+       core/basis, core/transforms, core/colors,
+       core/nodepaths, core/rids, core/dictionaries,
+       core/arrays, core/poolarrays, core/variants
 import godotinternal
 
 ## This module defines ``NimGodotObject`` and ``toVariant``/``fromVariant``
