@@ -202,7 +202,7 @@ macro baseNativeType(T: typedesc): cstring =
     if typeName == "NimGodotObject":
       break
     t = getType(t[1][1])
-  if baseT == "":
+  if baseT.len == 0:
     result = newNilLit()
   else:
     let rStr = newNimNode(nnkRStrLit)
@@ -343,20 +343,23 @@ proc newRStrLit(s: string): NimNode {.compileTime.} =
   result = newNimNode(nnkRStrLit)
   result.strVal = s
 
-proc toGodotName(T: typedesc): string =
+macro toGodotName(T: typedesc): string =
+  var godotName: string
   if T is GodotString or T is string:
-    "String"
+    godotName = "String"
   elif T is SomeFloat:
-    "float"
+    godotName = "float"
   elif T is SomeUnsignedInt or T is SomeSignedInt:
-    "int"
-  else:
+    godotName = "int"
+  if godotName.len == 0:
     let nameStr = (($T.getType()[1][1].symbol).split(':')[0])
-    case nameStr:
-      of "File", "Directory", "Thread", "Mutex", "Semaphore":
-        "_" & nameStr
-      else:
-        nameStr
+    godotName = case nameStr:
+    of "File", "Directory", "Thread", "Mutex", "Semaphore":
+      "_" & nameStr
+    else:
+      nameStr
+
+  result = newLit(godotName)
 
 macro asCString(s: static[string]): cstring =
   result = newNimNode(nnkCallStrLit).add(

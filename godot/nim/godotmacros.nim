@@ -197,7 +197,7 @@ proc parseType(definition, callSite: NimNode): ObjectDecl =
       parseError(option, "valid type specifier expected")
   result.isTool = isTool
 
-  if result.parentName == "": result.parentName = "Object"
+  if result.parentName.len == 0: result.parentName = "Object"
   for statement in body:
     case statement.kind:
       of nnkVarSection:
@@ -444,7 +444,7 @@ proc genType(obj: ObjectDecl): NimNode {.compileTime.} =
   let objTy = newNimNode(nnkObjectTy)
   typeDef.add(newNimNode(nnkRefTy).add(objTy))
   objTy.add(newEmptyNode())
-  if obj.parentName == "":
+  if obj.parentName.len == 0:
     objTy.add(newEmptyNode())
   else:
     objTy.add(newNimNode(nnkOfInherit).add(ident(obj.parentName)))
@@ -503,11 +503,11 @@ proc genType(obj: ObjectDecl): NimNode {.compileTime.} =
     result.add(meth.nimNode)
 
   # Register Godot object
-  let parentName = if obj.parentName == "": newStrLitNode("Object")
+  let parentName = if obj.parentName.len == 0: newStrLitNode("Object")
                    else: newStrLitNode(obj.parentName)
   let classNameLit = newStrLitNode(obj.name)
   let classNameIdent = ident(obj.name)
-  let isRef: bool = if obj.parentName == "": false
+  let isRef: bool = if obj.parentName.len == 0: false
                     else: obj.parentName in refClasses
   # Wrapping bools with a newLit is required as a temporary workaround for
   # https://github.com/nim-lang/Nim/issues/7375

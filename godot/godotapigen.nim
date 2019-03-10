@@ -474,7 +474,7 @@ proc doGenerateMethod(tree: PNode, methodBindRegistry: var HashSet[string],
           newNode(nkBracketExpr).addChain(
             ident("array"), newIntLit(staticArgsLen), ident("pointer")),
           newNode(nkEmpty)))
-        argsAlloc.add(newCommand(ident("addr"), ident("argsStatic")))
+        argsAlloc.add(newDotExpr(ident("argsStatic"), ident("addr")))
       vars.add(newIdentDefs(argsName, newNode(nkEmpty), argsAlloc))
 
     let argConversions = newNode(nkStmtList)
